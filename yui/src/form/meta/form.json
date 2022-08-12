@@ -1,0 +1,11 @@
+{
+  "moodle-availability_esse3enrols-form": {
+    "requires": [
+        "base",
+        "node",
+        "event",
+        "node-event-simulate",
+        "moodle-core_availability-form"
+    ]
+  }
+}
