@@ -49,7 +49,7 @@ M.availability_esse3enrols.form.getNode = function(json) {
                 var file = this._node.files[0];
 
                 var esse3enrolsfilechooser = this;
-                var esse3enrolslist = this.next('.esse3enrolts-list-field');
+                var esse3enrolslist = this.next('.esse3enrols-list-field');
                 var esse3enrolsdisplaylist = this.next('.esse3enrols-list');
          
                 if (file) {
