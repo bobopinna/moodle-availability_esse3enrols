@@ -31,7 +31,7 @@ M.availability_esse3enrols.form.getNode = function(json) {
     html += '<span class="availability-esse3enrols">';
     if (idnumberlist == "") {
         html += '<input class="esse3enrols-file" name="esse3enrolsfile" type="file" />';
-    } 
+    }
     html += '<input class="esse3enrols-list-field" name="idnumbers" type="hidden" value="' + idnumberlist + '" />';
     html += '<span class="esse3enrols-list">' + idnumberlist.split(",").join("<br />") + '</span>';
     html += '</span></label>';
@@ -51,19 +51,19 @@ M.availability_esse3enrols.form.getNode = function(json) {
                 var esse3enrolsfilechooser = this;
                 var esse3enrolslist = this.next('.esse3enrols-list-field');
                 var esse3enrolsdisplaylist = this.next('.esse3enrols-list');
-         
+
                 if (file) {
                     var reader = new FileReader();
-                        
+
                     reader.onload = function (e) {
                         var data = e.target.result;
                         var workbook = XLSX.read(data, { type: 'binary' });
                         var idnumbers = [];
-    
+
                         workbook.SheetNames.forEach(function(sheetName) {
                             var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
                             var idColumn = "matricola".toLowerCase();
-                        
+
                             if (XL_row_object[0].hasOwnProperty("GRUPPO_GIUD_COD")) {
                                 XL_row_object.forEach(function(row) {
                                     // Student enrolment ordinal number.
