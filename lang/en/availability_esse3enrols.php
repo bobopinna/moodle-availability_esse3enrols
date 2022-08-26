@@ -23,9 +23,12 @@
  */
 
 $string['description'] = 'Limit access to students that are listed or not in a Esse3 enrolments file.';
-$string['getdescription'] = 'The user\'s idnumber is in ({$a})';
-$string['getdescriptionnot'] = 'The user\'s idnumber is not in ({$a})';
+$string['getdescription'] = 'The user\'s field {$a->field} is in ({$a->values})';
+$string['getdescriptionnot'] = 'The user\'s field {$a->field} is not in ({$a->values})';
 $string['missing'] = 'You must upload an Esse3 enrolments file.';
 $string['pluginname'] = 'Restriction by Esse3 enrolments';
 $string['privacy:metadata'] = 'The availability_esse3 plugin does not store any personal data.';
 $string['title'] = 'Esse3 enrolments';
+$string['esse3enrols_settings'] = 'Esse3 enrolments settings';
+$string['field'] = 'User profile field';
+$string['configfield'] = 'The user profile field that store the user identification number get from Esse3 files';

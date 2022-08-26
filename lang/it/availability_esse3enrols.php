@@ -23,9 +23,12 @@
  */
 
 $string['description'] = 'Limita l\'accesso a studenti che sono o non sono elencati in un file delle iscrizioni di Esse3.';
-$string['getdescription'] = 'Il codice identificativo dell\'utente &egrave; tra i seguenti ({$a})';
-$string['getdescriptionnot'] = 'Il codice identificativo dell\'utente non &egrave; tra i seguenti ({$a})';
+$string['getdescription'] = 'Il valore del campo {$a->field} dell\'utente &egrave; tra i seguenti ({$a->values})';
+$string['getdescriptionnot'] = 'Il valore del campo {$a->field} dell\'utente non &egrave; tra i seguenti ({$a->values})';
 $string['missing'] = 'Devi caricare un file delle iscrizioni di Esse3.';
 $string['pluginname'] = 'Criterio basato sulle iscrizioni di Esse3';
 $string['privacy:metadata'] = 'Il plugin "criterio di accesso basato sulle iscrizioni di Esse3" non memorizza dati personali.';
 $string['title'] = 'Iscritti di Esse3';
+$string['esse3enrols_settings'] = 'Impostazioni iscritti di Esse3';
+$string['field'] = 'Campo del profilo utente';
+$string['configfield'] = 'Il campo del profilo utente che contiene la matricola da confrontare con quelle elencate nei file di Esse3';

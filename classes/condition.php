@@ -94,20 +94,85 @@ class condition extends \core_availability\condition {
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
         global $CFG, $DB, $USER;
 
+        $iscurrentuser = $USER->id == $userid;
+        if (empty($userid) || isguestuser($userid) || ($iscurrentuser && !isloggedin())) {
+            // Must be logged in and can't be the guest.
+            return false;
+        }
+
         $allow = false;
-        $useridnumber = '';
-        if (($userid == $USER->id) && isset($USER->idnumber)) {
-            // Checking the idnumber method of the currently logged in user, so do not
-            // default to the account idnumber, because the session idnumber may be different.
-            $useridnumber = $USER->idnumber;
-        } else {
-            if (!is_null($userid)) {
-                // Checking access for someone else than the logged in user, so
-                // use the idnumber of that user account.
-                $useridnumber = $DB->get_field('user', 'idnumber', ['id' => $userid]);
+
+        $checkfield = get_config('availability_esse3enrols', 'field');
+        if (empty($checkfield)) {
+            $checkfield = 'idnumber';
+        }
+
+        $iscustomfield = false;
+        // Check for a custom profile field.
+        $customprefix = 'profile_';
+        $customfield = null;
+        if (substr($checkfield, 0, strlen($customprefix)) == $customprefix) {
+            $checkfield = substr($checkfield, strlen($customprefix));
+            require_once($CFG->dirroot . '/user/profile/lib.php');
+            $customfield = profile_get_custom_field_data_by_shortname($checkfield);
+            if ($customfield !== null) {
+                $iscustomfield = true;
+            }
+            if (!$iscustomfield) {
+                // Custom field no more defined we could skip any other tests.
+                return false;
             }
         }
-        if (in_array($useridnumber, $this->idnumbers)) {
+
+        $userfield = '';
+        if ($iscurrentuser) {
+            // Check for the logged in user.
+            if ($iscustomfield) {
+                // Checking if the custom profile fields are already available.
+                if (!isset($USER->profile)) {
+                    // Drat! they're not. We need to use a temp object and load them.
+                    // We don't use $USER as the profile fields are loaded into the object.
+                    $user = new \stdClass;
+                    $user->id = $USER->id;
+                    // This should ALWAYS be set, but just in case we check.
+                    require_once($CFG->dirroot . '/user/profile/lib.php');
+                    profile_load_custom_fields($user);
+                    if (array_key_exists($checkfield, $user->profile)) {
+                        $userfield = $user->profile[$checkfield];
+                    }
+                } else if (array_key_exists($checkfield, $USER->profile)) {
+                    // Hurrah they're available, this is easy.
+                    $userfield = $USER->profile[$checkfield];
+                }
+            } else {
+                if (isset($USER->{$checkfield})) {
+                    $userfield = $USER->{$checkfield};
+                } else {
+                    // Unknown user field. This should not happen.
+                    throw new \coding_exception('Requested user profile field does not exist');
+                }
+            }
+        } else {
+            // Checking access for someone else than the logged in user.
+            if ($iscustomfield) {
+                $userprofiledata = $DB->get_field('user_info_data', 'data',
+                        array('userid' => $userid, 'fieldid' => $customfield->id), IGNORE_MiSSING);
+                if ($userprofiledata !== false) {
+                    $userfield = $userprofiledata;
+                } else {
+                    $userfield = $customfield->defaultdata;
+                }
+            } else {
+                $userprofiledata = $DB->get_field('user', $checkfield, array('id' => $userid), MUST_EXISTS);
+                if ($userprofiledata !== false) {
+                    $userfield = $userprofiledata;
+                } else {
+                    // Unknown user field. This should not happen.
+                    throw new \coding_exception('Requested user profile field does not exist');
+                }
+            }
+        }
+        if (in_array($userfield, $this->idnumbers)) {
             $allow = true;
         }
         if ($not) {
@@ -128,9 +193,38 @@ class condition extends \core_availability\condition {
      * @return string Information string (for admin) about all restrictions on this item
      */
     public function get_description($full, $not, \core_availability\info $info) {
+        global $CFG;
+
         if (!empty($this->idnumbers)) {
+
+            $checkfield = get_config('availability_esse3enrols', 'field');
+            if (empty($checkfield)) {
+                $checkfield = 'idnumber';
+            }
+
+            // Check for a custom profile field.
+            $customprefix = 'profile_';
+            $customfield = null;
+            $translatedfieldname = '';
+            if (substr($checkfield, 0, strlen($customprefix)) == $customprefix) {
+                $checkfield = substr($checkfield, strlen($customprefix));
+                require_once($CFG->dirroot . '/user/profile/lib.php');
+                $customfield = profile_get_custom_field_data_by_shortname($checkfield);
+                if ($customfield !== null) {
+                    $translatedfieldname = $customfield->name;
+                } else {
+                    $translatedfieldname = get_string('missing', 'availability_profile', $checkfield);
+                }
+            } else {
+                $translatedfieldname = \core_user\fields::get_display_name($checkfield);
+            }
+
+            $a = new \stdClass();
+            $a->values = implode(', ', $this->idnumbers);
+            $a->field = self::description_format_string($translatedfieldname);
+
             $snot = $not ? 'not' : '';
-            return get_string('getdescription' .$snot, 'availability_esse3enrols', implode(', ', $this->idnumbers));
+            return get_string('getdescription' .$snot, 'availability_esse3enrols', $a);
         }
         return '';
     }
