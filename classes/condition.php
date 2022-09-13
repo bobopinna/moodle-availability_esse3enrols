@@ -216,7 +216,7 @@ class condition extends \core_availability\condition {
                     $translatedfieldname = get_string('missing', 'availability_profile', $checkfield);
                 }
             } else {
-                if (class_exists('\core_user\fields')) {
+                if (class_exists('core_user\fields')) {
                     $translatedfieldname = \core_user\fields::get_display_name($checkfield);
                 } else {
                     $translatedfieldname = get_user_field_name($checkfield);
@@ -225,7 +225,7 @@ class condition extends \core_availability\condition {
 
             $a = new \stdClass();
             $a->values = implode(', ', $this->idnumbers);
-            if (function_exists('self::description_format_string')) {
+            if (method_exists($this, 'description_format_string')) {
                 $a->field = self::description_format_string($translatedfieldname);
             } else {
                 $course = $info->get_course();
