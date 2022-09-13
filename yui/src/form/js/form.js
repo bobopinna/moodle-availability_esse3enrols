@@ -11,11 +11,13 @@ M.availability_esse3enrols.form = Y.Object(M.core_availability.plugin);
 /**
  * Initialises this plugin.
  *
- * Nothing to be initialized,
- *
  * @method initInner
+ * @param {String} The name of idnumber column in Esse3 files.
+ * @param {String} The name of idnumber field translated.
  */
-M.availability_esse3enrols.form.initInner = function() {
+M.availability_esse3enrols.form.initInner = function(idColumn, idNumberString) {
+    this.idColumn = idColumn.toLowerCase();
+    this.idNumberString = idNumberString.toLowerCase();
 };
 
 M.availability_esse3enrols.form.getNode = function(json) {
@@ -43,6 +45,8 @@ M.availability_esse3enrols.form.getNode = function(json) {
     if (!M.availability_esse3enrols.form.addedEvents) {
         M.availability_esse3enrols.form.addedEvents = true;
         var root = Y.one('.availability-field');
+        var idColumn = this.idColumn;
+        var idNumberString = this.idNumberString;
 
         root.delegate('change', function() {
             if (this._node.files.length > 0) {
@@ -62,7 +66,6 @@ M.availability_esse3enrols.form.getNode = function(json) {
 
                         workbook.SheetNames.forEach(function(sheetName) {
                             var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
-                            var idColumn = "matricola".toLowerCase();
 
                             if (XL_row_object[0].hasOwnProperty("GRUPPO_GIUD_COD")) {
                                 XL_row_object.forEach(function(row) {
@@ -78,7 +81,7 @@ M.availability_esse3enrols.form.getNode = function(json) {
                             } else {
                                 var columnName = null;
                                 for (var prop in XL_row_object[0]) {
-                                    if (prop.toLowerCase() == idColumn) {
+                                    if ((prop.toLowerCase() == idColumn) || (prop.toLowerCase() == idNumberString)) {
                                         columnName = prop;
                                     }
                                 }

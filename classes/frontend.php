@@ -48,7 +48,11 @@ class frontend extends \core_availability\frontend {
 
         $PAGE->requires->js(new \moodle_url('https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js'), true);
 
-        return array();
+        $idcolumn = 'Matricola';
+
+        $idnumberstring = \availability_esse3enrols\condition::get_translated_checkfield();
+
+        return array($idcolumn, $idnumberstring);
     }
 
     /**

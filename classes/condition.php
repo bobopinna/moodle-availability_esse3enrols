@@ -193,44 +193,22 @@ class condition extends \core_availability\condition {
      * @return string Information string (for admin) about all restrictions on this item
      */
     public function get_description($full, $not, \core_availability\info $info) {
-        global $CFG;
 
         if (!empty($this->idnumbers)) {
 
-            $checkfield = get_config('availability_esse3enrols', 'field');
-            if (empty($checkfield)) {
-                $checkfield = 'idnumber';
-            }
-
-            // Check for a custom profile field.
-            $customprefix = 'profile_';
-            $customfield = null;
-            $translatedfieldname = '';
-            if (substr($checkfield, 0, strlen($customprefix)) == $customprefix) {
-                $checkfield = substr($checkfield, strlen($customprefix));
-                require_once($CFG->dirroot . '/user/profile/lib.php');
-                $customfield = profile_get_custom_field_data_by_shortname($checkfield);
-                if ($customfield !== null) {
-                    $translatedfieldname = $customfield->name;
-                } else {
-                    $translatedfieldname = get_string('missing', 'availability_profile', $checkfield);
-                }
-            } else {
-                if (class_exists('core_user\fields')) {
-                    $translatedfieldname = \core_user\fields::get_display_name($checkfield);
-                } else {
-                    $translatedfieldname = get_user_field_name($checkfield);
-                }
-            }
+            $translatedfieldname = $this->get_translated_checkfield();
 
             $a = new \stdClass();
             $a->values = implode(', ', $this->idnumbers);
-            if (method_exists($this, 'description_format_string')) {
-                $a->field = self::description_format_string($translatedfieldname);
-            } else {
-                $course = $info->get_course();
-                $context = \context_course::instance($course->id);
-                $a->field = format_string($translatedfieldname, true, array('context' => $context));
+            $a->field = '';
+            if (!empty($translatedfieldname)) {
+                if (method_exists($this, 'description_format_string')) {
+                    $a->field = self::description_format_string($translatedfieldname);
+                } else {
+                    $course = $info->get_course();
+                    $context = \context_course::instance($course->id);
+                    $a->field = format_string($translatedfieldname, true, array('context' => $context));
+                }
             }
 
             $snot = $not ? 'not' : '';
@@ -247,6 +225,44 @@ class condition extends \core_availability\condition {
      */
     protected function get_debug_string() {
         return implode(', ', $this->idnumbers) ?? 'any';
+    }
+
+    /**
+     * Return the translated checkfield field name
+     *
+     * @return string The translated name of checkfield
+     */
+    public static function get_translated_checkfield() {
+        global $CFG;
+
+        $translatedfieldname = '';
+
+        $checkfield = get_config('availability_esse3enrols', 'field');
+        if (empty($checkfield)) {
+            $checkfield = 'idnumber';
+        }
+
+        // Check for a custom profile field.
+        $customprefix = 'profile_';
+        $customfield = null;
+        if (substr($checkfield, 0, strlen($customprefix)) == $customprefix) {
+            $field = substr($checkfield, strlen($customprefix));
+            require_once($CFG->dirroot . '/user/profile/lib.php');
+            $customfield = profile_get_custom_field_data_by_shortname($field);
+            if ($customfield !== null) {
+                $translatedfieldname = $customfield->name;
+            } else {
+                $translatedfieldname = get_string('missing', 'availability_profile', $checkfield);
+            }
+        } else {
+            if (class_exists('core_user\fields')) {
+                $translatedfieldname = \core_user\fields::get_display_name($checkfield);
+            } else {
+                $translatedfieldname = get_user_field_name($checkfield);
+            }
+        }
+
+        return $translatedfieldname;
     }
 
 }
