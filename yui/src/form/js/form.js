@@ -75,6 +75,20 @@ M.availability_esse3enrols.form.getNode = function(json) {
                                         }
                                     }
                                 });
+                            } else {
+                                var columnName = null;
+                                for (var prop in XL_row_object[0]) {
+                                    if (prop.toLowerCase() == idColumn) {
+                                        columnName = prop;
+                                    }
+                                }
+                                if (columnName != null) {
+                                    XL_row_object.forEach(function(row) {
+                                        if (row.hasOwnProperty(columnName) && (row[columnName] != '')) {
+                                            idnumbers.push(row[columnName]);
+                                        }
+                                    });
+                                }
                             }
                         });
                         if (idnumbers.length > 0) {
