@@ -216,12 +216,22 @@ class condition extends \core_availability\condition {
                     $translatedfieldname = get_string('missing', 'availability_profile', $checkfield);
                 }
             } else {
-                $translatedfieldname = \core_user\fields::get_display_name($checkfield);
+                if (class_exists('\core_user\fields')) {
+                    $translatedfieldname = \core_user\fields::get_display_name($checkfield);
+                } else {
+                    $translatedfieldname = get_user_field_name($checkfield);
+                }
             }
 
             $a = new \stdClass();
             $a->values = implode(', ', $this->idnumbers);
-            $a->field = self::description_format_string($translatedfieldname);
+            if (function_exists('self::description_format_string')) {
+                $a->field = self::description_format_string($translatedfieldname);
+            } else {
+                $course = $info->get_course();
+                $context = \context_course::instance($course->id);
+                $a->field = format_string($translatedfieldname, true, array('context' => $context));
+            }
 
             $snot = $not ? 'not' : '';
             return get_string('getdescription' .$snot, 'availability_esse3enrols', $a);
