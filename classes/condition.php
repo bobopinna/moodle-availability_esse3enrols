@@ -156,14 +156,14 @@ class condition extends \core_availability\condition {
             // Checking access for someone else than the logged in user.
             if ($iscustomfield) {
                 $userprofiledata = $DB->get_field('user_info_data', 'data',
-                        array('userid' => $userid, 'fieldid' => $customfield->id), IGNORE_MiSSING);
+                        array('userid' => $userid, 'fieldid' => $customfield->id), IGNORE_MISSING);
                 if ($userprofiledata !== false) {
                     $userfield = $userprofiledata;
                 } else {
                     $userfield = $customfield->defaultdata;
                 }
             } else {
-                $userprofiledata = $DB->get_field('user', $checkfield, array('id' => $userid), MUST_EXISTS);
+                $userprofiledata = $DB->get_field('user', $checkfield, array('id' => $userid), MUST_EXIST);
                 if ($userprofiledata !== false) {
                     $userfield = $userprofiledata;
                 } else {
