@@ -1,7 +1,8 @@
-moodle-availability_esse3enrols [![Build Status](https://github.com/bobopinna/moodle-availability_esse3enrols/workflows/Tests/badge.svg)](https://github.com/bobopinna/moodle-availability_esse3enrols/actions)
+moodle-availability_esse3enrols
 ======================================
 
-Restrict access based on list of enrolled students on Esse3 exam.
+Restrict access based on list of enrolled students on Esse3 exam. 
+You can upload an Excel file get from Esse3 software or a custom Excel file with a column header that match with the Moodle admin selected field name.
 
 # Idea
 The original idea was taken from a Moodle Core hack developed by Gian from UniPD.
